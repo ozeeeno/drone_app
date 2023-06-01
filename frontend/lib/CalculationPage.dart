@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
 import 'RESTService.dart';
 import 'calculation_data.dart';
@@ -21,27 +24,27 @@ class _CalculationPageState extends State<CalculationPage> {
       calculationDataList.clear();
     });
 
-    bool success = await RESTService.sendData(
-        illuminanceController.text, areaController.text);
+    RESTService.sendData(illuminanceController.text, areaController.text)
+        .then((response) {
+      if (response is http.Response && response.statusCode == 200) {
+        final json = jsonDecode(response.body) as Map<String, dynamic>;
+        final calculationData = CalculationData.fromJson(json);
 
-    if (success) {
-      try {
-        CalculationData data = await RESTService.getCalculationResult();
         setState(() {
           calculationDataList.clear();
-          calculationDataList.add(data);
+          calculationDataList.add(calculationData);
           isLoading = false;
         });
-      } catch (error) {
+      } else {
         setState(() {
           isLoading = false;
         });
       }
-    } else {
+    }).catchError((error) {
       setState(() {
         isLoading = false;
       });
-    }
+    });
   }
 
   @override
@@ -102,9 +105,37 @@ class _CalculationPageState extends State<CalculationPage> {
                       itemCount: calculationDataList.length,
                       itemBuilder: (context, index) {
                         CalculationData data = calculationDataList[index];
+                        String name = '';
+
+                        switch (index) {
+                          case 0:
+                            name = '촬영 속도';
+                            break;
+                          case 1:
+                            name = '촬영 거리';
+                            break;
+                          case 2:
+                            name = '조도';
+                            break;
+                          case 3:
+                            name = '셔터 스피드';
+                            break;
+                          case 4:
+                            name = 'F수';
+                            break;
+                          case 5:
+                            name = 'ISO';
+                            break;
+                          case 6:
+                            name = 'Pixel';
+                            break;
+                          case 7:
+                            name = '최소 오차';
+                            break;
+                        }
                         return ListTile(
                           title: Text(
-                            data.name,
+                            name,
                             style: const TextStyle(fontSize: 16),
                           ),
                           subtitle: Text(

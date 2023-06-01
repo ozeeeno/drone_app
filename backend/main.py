@@ -12,6 +12,11 @@ class CalculationResult(BaseModel):
     result: Union[List[float], None]
 
 
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+
+
 @app.get("/calculation", response_model=CalculationResult)
 async def calculation(illuminance: str, area: float):
     try:
