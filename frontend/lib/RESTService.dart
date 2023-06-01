@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'calculation_data.dart'; // Import the CalculationData class
 
 class RESTService {
-  static const String apiUrl = 'http://127.0.0.1:8000/calculation';
+  static const String apiUrl = 'drone-app-vert.vercel.app';
 
   static Future<bool> sendData(String illuminance, String area) async {
     try {
