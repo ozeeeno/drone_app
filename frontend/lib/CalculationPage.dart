@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-
 import 'package:flutter/material.dart';
 import 'RESTService.dart';
 import 'calculation_data.dart';
@@ -24,27 +21,20 @@ class _CalculationPageState extends State<CalculationPage> {
       calculationDataList.clear();
     });
 
-    RESTService.sendData(illuminanceController.text, areaController.text)
-        .then((response) {
-      if (response is http.Response && response.statusCode == 200) {
-        final json = jsonDecode(response.body) as Map<String, dynamic>;
-        final calculationData = CalculationData.fromJson(json);
+    var response = await RESTService.sendData(
+        illuminanceController.text, areaController.text);
 
-        setState(() {
-          calculationDataList.clear();
-          calculationDataList.add(calculationData);
-          isLoading = false;
-        });
-      } else {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    }).catchError((error) {
+    if (response is CalculationData) {
+      setState(() {
+        calculationDataList.clear();
+        calculationDataList.add(response);
+        isLoading = false;
+      });
+    } else {
       setState(() {
         isLoading = false;
       });
-    });
+    }
   }
 
   @override

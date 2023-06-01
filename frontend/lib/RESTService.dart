@@ -1,20 +1,18 @@
+import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 
 // Import the CalculationData class
+import 'calculation_data.dart';
 
 class RESTService {
   static Future<Object> sendData(String illuminance, String area) async {
-    try {
-      final url = Uri.parse(
-          'https://drone-app-2.vercel.app/calculation?illuminance=$illuminance&area=$area');
-
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        return response;
-      } else {
-        return false;
-      }
-    } catch (error) {
+    final response = await http.get(Uri.parse(
+        'http://drone-app-2.vercel.app/calculation?illuminance=$illuminance&area=$area'));
+    if (response.statusCode == 200) {
+      return CalculationData.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes)));
+    } else {
       return false;
     }
   }
